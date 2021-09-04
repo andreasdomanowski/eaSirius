@@ -1,4 +1,4 @@
-package net.domanowsi.easirius.m2t;
+package net.domanowski.easirius.m2t;
 
 import java.io.File;
 import java.net.URI;

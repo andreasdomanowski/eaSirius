@@ -1,4 +1,4 @@
-package net.domanowsi.easirius.wizard;
+package net.domanowski.easirius.wizard;
 
 import java.io.File;
 

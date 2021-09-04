@@ -1,4 +1,4 @@
-package net.domanowsi.easirius.wizard;
+package net.domanowski.easirius.wizard;
 
 import java.util.Objects;
 
@@ -6,7 +6,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import net.domanowsi.easirius.m2t.EaSiriusApplication;
+
+import net.domanowski.easirius.m2t.EaSiriusApplication;
 
 public class EaSiriusWizard extends Wizard implements INewWizard {
 
