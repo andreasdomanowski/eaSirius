@@ -21,31 +21,11 @@ public class EaSiriusApplication {
 
 	}
 
-	private static final String CLI_OPTION_PATH_EDITOR_DESCRIPTION = "d";
-	private static final String CLI_OPTION_PATH_META_MODEL = "mm";
-	private static final String CLI_OPTION_PATH_TARGET_FOLDER = "t";
-
-	private static final String ERROR_MESSAGE_ILLEGAL_EDITOR_DESCRIPTION_FILE = "The specified path to the editor description does not exist or is not a file";
-	private static final String ERROR_MESSAGE_ILLEGAL_META_MODEL_FILE = "The specified path to the editor description does not exist or is not a file";
-	private static final String ERROR_MESSAGE_ILLEGAL_OUTPUT_FOLDER = "The specified path to the output folder does not exist or is no folder";
-
 	public static void generateEditor(String pathToEditorDescriptionString, String pathToMetaModelString,
 			String pathToOutputFolderString) {
 		File editorDescriptionFile = new File(pathToEditorDescriptionString);
 		File metaModelFile = new File(pathToMetaModelString);
 		File targetFolderFile = new File(pathToOutputFolderString);
-
-		if (!editorDescriptionFile.exists() || !editorDescriptionFile.isFile()) {
-			throw new IllegalArgumentException(ERROR_MESSAGE_ILLEGAL_EDITOR_DESCRIPTION_FILE);
-		}
-
-		if (!metaModelFile.exists() || !metaModelFile.isFile()) {
-			throw new IllegalArgumentException(ERROR_MESSAGE_ILLEGAL_META_MODEL_FILE);
-		}
-
-		if (!targetFolderFile.exists() || !targetFolderFile.isDirectory()) {
-			throw new IllegalArgumentException(ERROR_MESSAGE_ILLEGAL_OUTPUT_FOLDER);
-		}
 
 		executeEcoreTransformations(metaModelFile, targetFolderFile);
 
@@ -60,7 +40,6 @@ public class EaSiriusApplication {
 
 		StringProperties modelProperties = new StringProperties();
 		modelProperties.setProperty(EmfModel.PROPERTY_NAME, "Model");
-		;
 		modelProperties.setProperty(EmfModel.PROPERTY_METAMODEL_URI, "http://www.eclipse.org/emf/2002/Ecore");
 		modelProperties.setProperty(EmfModel.PROPERTY_MODEL_URI,
 				metaModelFile.toPath().toAbsolutePath().toUri().toString());
