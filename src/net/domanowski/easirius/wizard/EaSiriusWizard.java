@@ -2,6 +2,7 @@ package net.domanowski.easirius.wizard;
 
 import java.util.Objects;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -39,6 +40,7 @@ public class EaSiriusWizard extends Wizard implements INewWizard {
 		Objects.requireNonNull(outputFolderPath);
 
 		EaSiriusApplication.generateEditor(odesignPath, metamodelPath, outputFolderPath);
+		MessageDialog.openInformation(getShell(), "eaSirius", "Generated Editor. Or Not. Implement success check!");
 
 		return true;
 	}
