@@ -1,0 +1,68 @@
+[% 
+var numberOfAttributes = eClass.eAllStructuralFeatures.select(feature|feature.isTypeOf(EAttribute)).size();
+// generate properties panel just for non abstract classes and if the number of attributes > 0
+if(not eClass.abstract and numberOfAttributes > 0){
+	var propertiesFormIdentifierList = new Sequence;
+%]
+
+// PROPERTIES PANEL FOR [%=eClass.name%]
+// click listener on each graphical element
+// if the domain class represented by this mapping is of type [%=eClass.name%]
+// then add an input field in the properties panel for each attribute of this class
+// changes are propagated to the domain model element
+// a graphical refresh is requested by the model synchronization bus
+paper.on('element:pointerclick', function (cellView: CellView) {
+    const modelElement = cellView.model.prop('mapping');
+    const className = modelElement.eClass().name;
+
+    if (className === '[%=eClass.name%]') {
+    	// remove prior properties panel and all its listeners
+    	removePropertiesFormAndListeners();
+        let propertiesPanel = document.getElementById(domIdentifier.editorPropertiesPanelIdentifier);      
+        
+        [%
+        // for each attribute, generate form element and listener
+		for (eAttribute in eClass.eAllStructuralFeatures.select(feature|feature.isTypeOf(EAttribute))) {
+			var newPropertiesFormIdentifier = "propertiesEditor_"+eClass.name+"_"+eAttribute.name;
+			propertiesFormIdentifierList.add(newPropertiesFormIdentifier);
+			%]
+		// form elements for [%=eClass.name+"_"+eAttribute.name%]
+		// add a label and an input field for attribute [%=eAttribute.name%]
+		let label_[%=eClass.name+"_"+eAttribute.name%] : HTMLLabelElement= (<HTMLLabelElement>document.createElement('label'));
+		let input_[%=eClass.name+"_"+eAttribute.name%] = document.createElement('input');
+		label_[%=eClass.name+"_"+eAttribute.name%].htmlFor = 'propertiesEditor_EllipseNode_label';
+		label_[%=eClass.name+"_"+eAttribute.name%].innerHTML = "[%=eAttribute.name.ftuc()%]";
+		input_[%=eClass.name+"_"+eAttribute.name%].type = 'input';
+		input_[%=eClass.name+"_"+eAttribute.name%].id = '[%=newPropertiesFormIdentifier%]'
+		propertiesPanel.appendChild(label_[%=eClass.name+"_"+eAttribute.name%]);
+		propertiesPanel.appendChild(document.createElement('br'));
+		propertiesPanel.appendChild(input_[%=eClass.name+"_"+eAttribute.name%]);
+		propertiesPanel.appendChild(document.createElement('br'));		
+
+		// add input change listener to new input field
+        input_[%=eClass.name+"_"+eAttribute.name%].value = modelElement.[%=eAttribute.name%];
+        let onChangeListener_[%=eAttribute.name%] = () =>   {
+        	let toExecute = () => { modelElement.[%=eAttribute.name%] = input_[%=eClass.name+"_"+eAttribute.name%].value };
+        	modelSynchronizationBus.executeModelChangeAndNotifyGraph(toExecute);
+       	}
+        input_[%=eClass.name+"_"+eAttribute.name%].addEventListener('input', onChangeListener_[%=eAttribute.name%]);
+        eventListenerMap.set(input_[%=eClass.name+"_"+eAttribute.name%], onChangeListener_[%=eAttribute.name%]);
+        // end form elements for [%=eClass.name+"_"+eAttribute.name%]
+        
+		[%	
+		}
+		%]
+		// add remove button for currently selected element
+		let removeButton = document.createElement('button');
+		removeButton.innerHTML = "Remove";
+		removeButton.addEventListener('click', ev => {
+			graph.removeCells([graph.getCell(cellView.model)]);
+			// remove properties panel, since there is nothing left to edit
+			removePropertiesFormAndListeners();
+		})
+		propertiesPanel.appendChild(removeButton);
+		
+	// end if class === [%=eClass.name%]
+	}
+});
+[%}%]

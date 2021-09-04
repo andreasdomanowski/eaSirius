@@ -1,0 +1,4 @@
+[%
+var fileExtension = viewpoint.modelFileExtension;
+%]
+export const serializedFileExtension : string = "[%=fileExtension%]";

@@ -1,0 +1,22 @@
+import { TextEncoder, TextDecoder } from 'util'
+import * as domIdentifier from "../const/domIdentifier";
+
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
+
+// set up mock document structure
+let lifecycleDivMock = document.createElement('div');
+lifecycleDivMock.id = domIdentifier.editorLifecycleManagementIdentifier;
+document.body.appendChild(lifecycleDivMock);
+
+let canvasDivMock = document.createElement('div');
+canvasDivMock.id = domIdentifier.editorCanvasIdentifier;
+document.body.appendChild(canvasDivMock);
+
+let propertiesPanelDivMock = document.createElement('div');
+propertiesPanelDivMock.id = domIdentifier.editorPropertiesPanelIdentifier;
+document.body.appendChild(propertiesPanelDivMock);
+
+let paletteDivMock = document.createElement('div');
+paletteDivMock.id = domIdentifier.editorPaletteIdentifier;
+document.body.appendChild(paletteDivMock);

@@ -1,0 +1,57 @@
+import * as domIdentifier from '../const/domIdentifier'
+import {graph, paper} from '../editor/editor';
+import {dia} from "jointjs";
+import CellView = dia.CellView;
+import * as modelSynchronizationBus from '../modelSynchronization/modelSynchronizationBus'
+
+
+
+/**
+ * Due to every properties editor adding listeners to fields without clearing them up,
+ * there is an map to keep track of all listeners.
+ * If removePropertiesFormAndListeners is called, all listeners are removed from the properties panel.
+ */
+let eventListenerMap = new Map();
+
+/**
+ * Resets the properties form after removing all listeners from it.
+ */
+function removePropertiesFormAndListeners(){
+    let propertiesPanel = document.getElementById(domIdentifier.editorPropertiesPanelIdentifier);
+    eventListenerMap.forEach( ((value, key) => {
+        key.removeEventListener('change', value);
+    }));
+    eventListenerMap.clear();
+    propertiesPanel.innerHTML = '';
+}
+
+/**
+ * If editor users click on blank canvas, reset properties panel.
+ */
+paper.on('blank:pointerclick', () => {
+	removePropertiesFormAndListeners();
+});
+
+/**
+ * When users click on links, the properties panel show a delete button.
+ * Upon clicking that button:
+ * 	i) cell view is removed from graph
+ * 	ii) onRemove functions are called on cell view's model
+ */
+paper.on('link:pointerclick', function (cellView: CellView) {
+	removePropertiesFormAndListeners();
+	let propertiesPanel = document.getElementById(domIdentifier.editorPropertiesPanelIdentifier);
+
+	if(cellView.model.isLink()){
+		// add remove button for currently selected element
+		let removeButton = document.createElement('button');
+		removeButton.innerHTML = "Remove";
+		// click listener on button
+		removeButton.addEventListener('click', ev => {
+			// remove graphical representation, this trigger onRemove methods on cell view model
+			// listener defined in editor.ts
+			graph.removeCells([graph.getCell(cellView.model)]);
+		})
+		propertiesPanel.appendChild(removeButton);
+	}
+});

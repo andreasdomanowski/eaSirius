@@ -1,0 +1,63 @@
+import * as joint from "jointjs";
+import {graph, paper} from "../editor/editor";
+import * as domIdentifier from '../const/domIdentifier'
+
+// For each new element in the graph, add
+// i) boundary tool, which displays its borders
+// ii) deletion tool, which can trigger its removal from the graph
+graph.on('add', function (element) {
+    let boundaryTool = new joint.elementTools.Boundary();
+    let removeButton = new joint.elementTools.Remove();
+
+    let toolsView = new joint.dia.ToolsView({
+        tools: [boundaryTool, removeButton]
+    });
+
+    let elementView = element.findView(paper);
+    elementView.addTools(toolsView);
+    // hide tools by default
+    elementView.hideTools();
+});
+
+// show tools only on mouseover
+paper.on('element:mouseenter', function (elementView) {
+    elementView.showTools();
+});
+paper.on('element:mouseleave', function (elementView) {
+    elementView.hideTools();
+});
+
+// upon clicking on an cell view, mark it visually
+paper.on('cell:pointerclick', cellView => {
+    // unhighlight all other cells, since only can can be selected
+    unhightlightAllCellViews();
+    // highlight the currently selected cell
+    cellView.highlight(null, highLighter);
+});
+
+// upon clicking on blank canvas, unhighligh all cells
+paper.on('blank:pointerclick', () => {
+    unhightlightAllCellViews();
+});
+
+/**
+ * Iterates over all cell views and unhighlights them.
+ */
+function unhightlightAllCellViews() {
+    graph.getCells().forEach(cell => {
+        paper.findViewByModel(cell).unhighlight(null, highLighter);
+    })
+}
+
+/**
+ *  defines the highlighter, which highlights elements upon a click.
+ *  Highlighter adds a certain class to a view
+ */
+let highLighter = {
+    highlighter: {
+        name: 'addClass',
+        options: {
+            className: domIdentifier.cellHighlightCssClass
+        }
+    }
+};

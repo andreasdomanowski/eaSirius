@@ -1,0 +1,31 @@
+// returns list of all operations
+// RESTRICTION - gets in order, but does not reset
+// maybe work around with Tuples
+operation getAllOperations(nodeCreationDescription : Any) : Sequence {
+	var operationSequence : Collection = new Sequence;
+	
+	var initialOp = nodeCreationDescription.initialOperation;
+	var firstOperation = initialOp.firstModelOperations;
+	operationSequence.add(firstOperation);
+
+	var nextSubModelOperationsCollection = nodeCreationDescription.initialOperation.firstModelOperations?.subModelOperations;
+
+	for (op in nextSubModelOperationsCollection) { 
+		operationSequence.add(op);
+		addAllChildrenToOperationList(op, operationSequence);
+	}
+	
+	return operationSequence;
+}
+// returns list of all children (recursively)
+operation addAllChildrenToOperationList(op : Any, list : Collection) : Sequence {
+	// if it has subModelOperations property, add children and call recursively
+	if(op.hasProperty("subModelOperations")){
+		// get children
+		var children = op.subModelOperations;
+		for(child in children){
+			list.add(child);
+			addAllChildrenToOperationList(child, list);
+		}
+	}
+}

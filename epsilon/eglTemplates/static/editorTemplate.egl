@@ -1,0 +1,72 @@
+import * as joint from 'jointjs';
+import * as domIdentifier from "../const/domIdentifier";
+import {createRootElement} from "../elementCreation/elementFactory";
+
+const editorCanvasInDOM = document.getElementById(domIdentifier.editorCanvasIdentifier);
+
+/**
+ * the graph - representing the model
+ * This call initializes a new graph as well as a new semantic root element
+ */
+export let graph = initNewGraphAndSemanticRootElement();
+
+/**
+ * initial semantic root element, representing the canvas
+ * from viewpoint specification
+ */
+export let currentRootElement = createRootElement();
+
+/**
+ * the paper, representing the view
+ */
+export let paper = initNewPaper(graph);
+
+/**
+ * Initializes a completely new editor instance with a new semantic root element
+ * Discards previous editor and the underlying domain model
+ */
+function initBlankEditorInstance(): void {
+    if (graph != null) {
+        graph.clear();
+    }
+
+    graph = initNewGraphAndSemanticRootElement();
+    paper = initNewPaper(graph);
+}
+
+/**
+ * Initializes a new graph and creates a new semantic root element.
+ * Discards previous semantic root element.
+ */
+function initNewGraphAndSemanticRootElement() {
+    currentRootElement = createRootElement();
+    return new joint.dia.Graph({}, {});
+}
+
+/**
+ * Initializes a new paper/view for the graph.
+ * domIdentifier.editorCanvasIdentifier holds the diagram canvas.
+ *
+ * @param graph Graph representing the model
+ */
+function initNewPaper(graph) {
+    return new joint.dia.Paper({
+        el: editorCanvasInDOM,
+        model: graph,
+        cellViewNamespace: joint.shapes,
+        width: editorCanvasInDOM.offsetWidth,
+        height: editorCanvasInDOM.offsetHeight,
+        gridSize: 1,
+        restrictTranslate: true
+    });
+}
+
+// Get div for editor lifecycle management, add button for resetting editor + creating a new blank model
+let resetEditorButton = document.createElement('button');
+resetEditorButton.innerText = 'Reset Editor';
+document.getElementById(domIdentifier.editorLifecycleManagementIdentifier).appendChild(resetEditorButton);
+
+// Add click listener on that button
+resetEditorButton.addEventListener('click', e => {
+    initBlankEditorInstance();
+});

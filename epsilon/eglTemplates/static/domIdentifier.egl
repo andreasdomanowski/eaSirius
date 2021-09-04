@@ -1,0 +1,6 @@
+export const editorCanvasIdentifier : string = 'generatedEditor';
+export const editorPaletteIdentifier : string = 'generatedEditorPalette';
+export const editorLifecycleManagementIdentifier : string = 'generatedEditorLifecycleManagement';
+export const editorPropertiesPanelIdentifier : string = 'generatedEditorPropertiesPanel';
+
+export const cellHighlightCssClass : string = 'generatedEditorHighlightedElement';

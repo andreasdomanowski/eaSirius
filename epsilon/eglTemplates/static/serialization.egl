@@ -1,0 +1,33 @@
+import {DOMParser} from "xmldom/lib/dom-parser"
+import * as domIdentifier from "../const/domIdentifier";
+import {currentRootElement} from "../editor/editor";
+import {XmiResource} from "crossecore";
+import * as editorMetaData from '../const/editorMetadata';
+
+// taken and adapted from https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server
+function save(filename : string, data : any) {
+    let blob = new Blob([data], {type: 'text/xml'});
+    if ('msSaveOrOpenBlob' in window.navigator) {
+        //@ts-ignore
+        window.navigator.msSaveBlob(blob, filename);
+    } else {
+        let elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+    }
+}
+
+// Get div for editor lifecycle management, add button for serializing model
+let serializeButton = document.createElement('button');
+serializeButton.innerText = 'Export XMI';
+document.getElementById(domIdentifier.editorLifecycleManagementIdentifier).appendChild(serializeButton);
+
+// Add click listener on that button
+serializeButton.addEventListener('click', e => {
+    let resource = new XmiResource(new DOMParser())
+    const xmi = resource.save(currentRootElement);
+    save("model." + editorMetaData.serializedFileExtension, xmi)
+});

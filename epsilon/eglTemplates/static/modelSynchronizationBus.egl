@@ -1,0 +1,28 @@
+import {graph} from './../editor/editor';
+import * as props from '../const/jointJsPropMapping'
+
+/**
+ * This function is intended for the execution of a piece of code, but with calling all
+ * cells in the graph and requesting a redraw.
+ * Purpose: When the semantic model changes, e.g., with an update of a structural feature
+ * which is mapped to graphical elements -> request redraw
+ * @param instructions function which is to be executed
+ */
+export function executeModelChangeAndNotifyGraph(instructions: Function) {
+    instructions();
+    graph.getCells().forEach(cell => {
+        let refreshFunctions = cell.prop(props.graphicalRefreshFunctions);
+        if (refreshFunctions != null) {
+            refreshFunctions.forEach(refreshFunction => refreshFunction());
+        }
+    });
+}
+
+// If an element in the graph is to be removed --> get its onRemoveFunctionSet, call every function.
+// this removes the element from the domain model
+graph.on('remove', function (cell) {
+    let onRemoveFunctionSet = cell.prop(props.onRemoveFunctionSet);
+    if(onRemoveFunctionSet != null){
+        onRemoveFunctionSet.forEach(onRemoveFunction => onRemoveFunction.apply());
+    }
+});

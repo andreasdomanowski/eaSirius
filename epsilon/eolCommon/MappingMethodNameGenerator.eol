@@ -1,0 +1,16 @@
+//operation generateEdgeCreationMethodName(edgeCreationDescription : EdgeCreationDescription) : String {
+//	return "createEdgeMapping" + nodeMapping.name;
+//}
+
+operation generateEdgeMappingCreationMethodName(edgeMapping : EdgeMapping) : String {
+	return "createEdgeMapping_" + edgeMapping.name;
+}
+
+operation generateNodeCreationMethodName(nodeCreationDescription : NodeCreationDescription) : String {
+	return "createSemanticNodeAndNodeMapping_" + nodeCreationDescription.name;
+}
+
+operation generateNodeMappingCreationMethodName(nodeMapping : NodeMapping) : String {
+	return "createNodeMapping_" + nodeMapping.name;
+}
+

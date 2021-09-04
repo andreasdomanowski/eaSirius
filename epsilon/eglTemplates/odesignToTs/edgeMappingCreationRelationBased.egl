@@ -1,0 +1,24 @@
+[%
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/MappingMethodNameGenerator.eol";
+
+var edgeMappingStyle = edgeMapping.style;
+var sourceArrow = edgeMappingStyle.sourceArrow;
+var targetArrow = edgeMappingStyle.targetArrow;
+var strokeColor = edgeMappingStyle.strokeColor;
+ %]
+ 
+ function [%=generateEdgeMappingCreationMethodName(edgeMapping)%](sourceCell, targetCell, onRemoveFunction){
+	var link = new joint.shapes.standard.Link();
+    link.source(sourceCell);
+    link.target(targetCell);
+    link.addTo(graph);
+        		
+    // function for source element, which is to be called, when source element is removed
+	let onRemoveFunctionSet = new Set();
+    onRemoveFunctionSet.add(onRemoveFunction);
+    link.prop(props.onRemoveFunctionSet, onRemoveFunctionSet);
+ }
+ 
+ 
+				
+				

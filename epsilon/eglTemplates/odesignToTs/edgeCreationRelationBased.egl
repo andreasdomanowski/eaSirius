@@ -1,0 +1,200 @@
+[%
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/OperationTreeToList.eol";
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/StringUtils.eol";
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/MappingMethodNameGenerator.eol";
+
+
+
+var operationSequence : Collection = getAllOperations(edgeCreationDescription);
+
+// contains a list of all mappings / graphical representations, the edge refers to
+var sourceMappings = new Sequence;
+var targetMappings = new Sequence;
+
+for (mappingCollection in edgeCreationDescription.edgeMappings.sourceMapping) { 
+	for(mapping in mappingCollection){
+		sourceMappings.add(mapping);
+	}
+}
+
+for (mappingCollection in edgeCreationDescription.edgeMappings.targetMapping) { 
+	for(mapping in mappingCollection){
+		targetMappings.add(mapping);
+	}
+}
+
+var toolDisplayName : String = "Tool: " + edgeCreationDescription.id;
+if(edgeCreationDescription.hasProperty("label")){
+	toolDisplayName = edgeCreationDescription.label;
+}
+
+%]
+// create active state mapping, but set it to inactive
+activeToolManagement.activeToolMapping.set('is[%=edgeCreationDescription.name%]Active', false);
+
+// create button for link creation
+// if clicked, edge creation mode is true
+// Get palette, add button for new tool
+let paletteEntry[%=edgeCreationDescription.name%] = document.createElement('button');
+paletteEntry[%=edgeCreationDescription.name%].innerText = '[%=toolDisplayName%]';
+document.getElementById(domIdentifier.editorPaletteIdentifier).appendChild(paletteEntry[%=edgeCreationDescription.name%]);
+
+// trigger activation mode for [%=edgeCreationDescription.name%]
+paletteEntry[%=edgeCreationDescription.name%].addEventListener('click', e => {
+	// reset all tools, therefore deactivating all other tools
+	activeToolManagement.resetAllTools();	
+    activeToolManagement.activeToolMapping.set('is[%=edgeCreationDescription.name%]Active', true);
+    activeToolManagement.displayTextBesidesCursor(e, '[%=toolDisplayName%]');
+});
+
+// set up map with allowed source mappings for [%=edgeCreationDescription.name%]
+const allowedSourceMappings_[%=edgeCreationDescription.name%] = new Set();
+[%for (mapping in sourceMappings) {%] 
+allowedSourceMappings_[%=edgeCreationDescription.name%].add('[%=mapping.name%]');
+[%}%]
+
+// set up map with allowed target mappings for [%=edgeCreationDescription.name%]
+const allowedTargetMappings[%=edgeCreationDescription.name%] = new Set();
+[%for (mapping in targetMappings) {%] 
+allowedTargetMappings[%=edgeCreationDescription.name%].add('[%=mapping.name%]');
+[%}%]
+
+// onclick listener for nodes/links in the view
+// for creating [%=edgeCreationDescription.name%]
+paper.on('element:pointerclick', cellView => {
+	// if tool for creating [%=edgeCreationDescription.name%] is active, check currentlySelectedCell
+    if (activeToolManagement.activeToolMapping.get('is[%=edgeCreationDescription.name%]Active') === true) {
+    	// if no currentlySelectedCellview is set, check whether cellview within this onclick function represents
+    	// a valid source mapping for [%=edgeCreationDescription.name%]
+    	if(activeToolManagement.currentlySelectedCellview == null){
+			if(allowedSourceMappings_[%=edgeCreationDescription.name%].has(cellView.model.prop(props.mappingId))){
+    			activeToolManagement.setCurrentlySelectedCellview(cellView);
+    			return;
+			}
+    	}else{
+    		// if currently selected cellview is set and cell represents a desired source mapping
+    		// then check, if the target mapping fits, too. This avoids semantic conflicts if other tool was activated.
+    		// if it does:
+    		//	i) update domain model
+    		// 	ii) draw relation			
+		if(allowedSourceMappings_[%=edgeCreationDescription.name%].has(activeToolManagement.currentlySelectedCellview.model.prop(props.mappingId)) &&
+			allowedTargetMappings[%=edgeCreationDescription.name%].has(cellView.model.prop(props.mappingId))){
+
+				// function for source element, which is to be called, when source element is removed
+				// invoked in editorTools.ts (see graph.on('remove',...))
+				let onRemoveFunction = null;
+				
+				
+				// update semantic model
+				let semanticSource = activeToolManagement.currentlySelectedCellview.model.prop(props.semanticDomainElement);
+				let semanticTarget = cellView.model.prop(props.semanticDomainElement);
+				
+				let generatedVar_[%=edgeCreationDescription.sourceVariable.name%] = semanticSource;
+				let generatedVar_[%=edgeCreationDescription.targetVariable.name%] = semanticTarget;
+				[% // begin operation sequence
+				var currentContext = "";
+				for(op in operationSequence){
+					if(op.isTypeOf(ChangeContext)){
+						var withoutVar = purgeLeadingVarExpression(op.browseExpression);
+						// 
+						if(edgeCreationDescription.sourceVariable.name.equals(withoutVar)){
+							currentContext = 'generatedVar_' + edgeCreationDescription.sourceVariable.name;
+						}
+						if(edgeCreationDescription.targetVariable.name.equals(withoutVar)){
+							currentContext = 'generatedVar_' + edgeCreationDescription.targetVariable.name;
+						}
+						// TODO - feature: prefix
+					}
+					if(op.isTypeOf(SetValue)){
+						var referenceComplete = currentContext + "." + op.featureName;
+						var whatToSet = "";
+						var valueExpression = op.valueExpression;
+						if(valueExpression.startsWith('var:')){
+							valueExpression = 'generatedVar_'+purgeLeadingVarExpression(valueExpression);
+						}
+						if(valueExpression.startsWith('feature:')){
+							// TODO - feature
+						}
+						%]
+					if([%=referenceComplete%] != null && 'add' in [%=referenceComplete%]){
+						// case: since there is an add-function in the reference, this implies
+						// that it is a collection. 
+						// Therefore - add new target to it!
+						// @ts-ignore
+						[%=referenceComplete%].add([%=valueExpression%]);
+						// on remove, unset reference
+						onRemoveFunction = function(){
+							[%=referenceComplete%].remove(generatedVar_target)
+						}	
+					}
+					else{
+						// case: since there is no add-function in the reference, this implies
+						// that it is a 0..1 relation
+						// Therefore - set property to new target
+						// but before doing this - remove prior links and mappings
+						// on remove, unset reference
+						onRemoveFunction = function(){
+							[%=referenceComplete%] = null;
+						}
+						// Since we are in this branch, this means that source domain element has
+						// no collection, just a single variable, which is to be set
+						// this implies a 0..1 cardinality -> therefore, the old graphical representations
+						// have to be removed
+						// iterate over all existing cells
+						graph.getCells().forEach(existingCell => {
+							// check every cell, if it is a link
+							if(existingCell.isLink()){
+								let existingLinkSourceCell = graph.getCell(existingCell.attributes.source.id);
+								let existingLinkTargetCell = graph.getCell(existingCell.attributes.target.id);
+
+								let existingLinkSourceId = existingLinkSourceCell.id;
+	
+								let existingSourceCellMappingId = existingLinkSourceCell.prop(props.mappingId);
+								let existingTargetCellMappingId = existingLinkTargetCell.prop(props.mappingId);
+	
+								let newSourceMappingId = activeToolManagement.currentlySelectedCellview.model.prop(props.mappingId);
+								let newTargetMappingId = cellView.model.prop(props.mappingId);
+	
+								let newSourceId = activeToolManagement.currentlySelectedCellview.model.id;
+	
+								// if new link source is the same as in the existing source
+								// and mappings of sources and of targets in existing new link are the same
+								// then remove the old link
+								if(newSourceId == existingLinkSourceId
+									&& newSourceMappingId == existingSourceCellMappingId
+									&& newTargetMappingId == existingTargetCellMappingId){
+									graph.removeCells([existingCell]);
+								}
+							}
+						});					
+						// actually add target
+						// @ts-ignore
+						[%=referenceComplete%] = [%=valueExpression%];
+					}
+					// add onRemove function to source
+					cellView.model.prop(props.onRemoveFunctionSet).add(onRemoveFunction);
+					
+						[%
+					}
+				}
+				// end operation sequence
+				%]
+				
+				[%
+				// iterate over all EdgeMappings, which are to be instantiated
+				for(edgeMapping in edgeCreationDescription.edgeMappings){
+					// call generated method for edgeMapping
+					var currentCreateEdgeMappingFunction = generateEdgeMappingCreationMethodName(edgeMapping);
+					// call generateEdgeMapping(sourceView.model, targetView.model, onRemoveFunction)
+					%]
+				[%=currentCreateEdgeMappingFunction%](activeToolManagement.currentlySelectedCellview.model, cellView.model, onRemoveFunction);
+					[%
+				}
+				// end iterate over all EdgeMappings				
+				%]
+				// reset all tools
+				activeToolManagement.resetAllTools();			
+			}
+    	}
+    }
+});

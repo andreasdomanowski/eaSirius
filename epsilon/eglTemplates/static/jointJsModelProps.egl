@@ -1,0 +1,4 @@
+export const graphicalRefreshFunctions = 'refreshGraphicalRepresentationFunctionList';
+export const semanticDomainElement = 'mapping';
+export const mappingId = 'mappingId';
+export const onRemoveFunctionSet = 'onRemoveFunctionSet'

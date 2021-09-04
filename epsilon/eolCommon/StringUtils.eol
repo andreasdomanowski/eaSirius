@@ -1,0 +1,25 @@
+operation getDomainClassFromQualifiedName(qualifiedName : String) : String {
+	var splitDomainClassName = qualifiedName.split("::");
+	return splitDomainClassName[1];
+}
+
+operation getPackageNameFromQualifiedName(qualifiedName : String) : String {
+	var splitDomainClassName = qualifiedName.split("::");
+	return splitDomainClassName[0];
+}
+
+operation purgeLeadingFeatureExpression(stringWithFeaturePrefix : String) : String {
+	var featurePrefix = "feature:";
+	if(stringWithFeaturePrefix.startsWith(featurePrefix)){
+		return stringWithFeaturePrefix.replace(featurePrefix, "");
+	}
+	return stringWithFeaturePrefix;
+}
+
+operation purgeLeadingVarExpression(stringWithVarPrefix : String) : String {
+	var varPrefix = "var:";
+	if(stringWithVarPrefix.startsWith(varPrefix)){
+		return stringWithVarPrefix.replace(varPrefix, "");
+	}
+	return stringWithVarPrefix;
+}

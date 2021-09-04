@@ -1,0 +1,97 @@
+[%
+// JointJS StandardShape
+// Rectangle
+// Circle, Ellipse, Path, Polygon, Polyline, Image, BorderedImage, EmbeddedImage
+// InscribedImage, HeaderedRectangle, Cylinder, TextBlock
+// Link, DoubleLink, ShadowLink
+
+// Sirius									mapped to	JointJS (joint.shapes.standard.*)						
+// Square -SquareDescription				-------->	Rectangle
+// Diamond - LozengeNodeDescription			-------->	?
+// Ellipse - EllipseNodeDescription			-------->	Ellipse
+// DotDescription							-------->	?
+// BasicShape - BundledImageDescription		-------->	?
+// NoteDescription							-------->	?
+// Gauge - GaugeCompositeStyleDescription	-------->	?
+// Image - WorkspaceImageDescription		-------->	Image
+// Custom Style - CustomStyleDescription	-------->	?
+
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/StringUtils.eol";
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/MappingMethodNameGenerator.eol";
+
+var domainClass = getDomainClassFromQualifiedName(nodeMapping.domainClass);
+var shape = nodeMapping.style;
+// LIMITATION: only accept "feature:..."
+// feature, which is displayed as label
+var featureExpression = purgeLeadingFeatureExpression(shape.labelExpression);
+
+var newShape = null;
+var additionalConfiguration = null;
+
+if(shape.isTypeOf(SquareDescription)){
+	newShape = "joint.shapes.standard.Rectangle()";
+	additionalConfiguration = "";
+}
+if(shape.isTypeOf(LozengeNodeDescription)){
+	newShape = "joint.shapes.standard.";
+}
+if(shape.isTypeOf(EllipseNodeDescription)){
+	newShape = "joint.shapes.standard.Ellipse()";
+	additionalConfiguration = "";
+}
+if(shape.isTypeOf(DotDescription)){
+	newShape = "joint.shapes.standard.";
+}
+if(shape.isTypeOf(BundledImageDescription)){
+	newShape = "joint.shapes.standard.";
+}
+if(shape.isTypeOf(NoteDescription)){
+	newShape = "joint.shapes.standard.";
+}
+if(shape.isTypeOf(GaugeCompositeStyleDescription)){
+	newShape = "joint.shapes.standard.";
+}
+if(shape.isTypeOf(WorkspaceImageDescription)){
+	newShape = "joint.shapes.standard.Image()";
+	additionalConfiguration = "";
+}
+if(shape.isTypeOf(CustomStyleDescription)){
+	newShape = "joint.shapes.standard.";
+}
+
+%]
+
+/**
+ * Defines the shape/style for the node mapping [%=nodeMapping.name%]
+ * @param node semantic node from EMF model
+ * @param graph model of JointJS editor
+ * @param paper view of JointJS editor
+ * @param x x-coordinate for new mapping instance
+ * @param y x-coordinate for new mapping instance
+ */
+export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, graph, paper, x, y){
+	let newShape = new [%=newShape%];
+	
+	newShape.attr('label/text', node.[%=featureExpression%]);
+	
+	// array of functions which are to be called, when graphical redraw is requested
+	const shapeMappingFunctions = [];
+	shapeMappingFunctions.push( () => {
+		newShape.attr('label/text', newShape.prop('mapping').[%=featureExpression%]);
+	});
+	
+	// every shape has reference (via shape.prop(..)) to:
+	// i) an array of functions which are executed by model synchronziation bus on change
+	// ii) a mapping to its domain element (crossecore implementation)
+	// iii) the id/name of its graphical mapping as specified in viewpoint specification
+	newShape.prop(props.graphicalRefreshFunctions, shapeMappingFunctions);
+	newShape.prop(props.semanticDomainElement, node);
+	newShape.prop(props.mappingId, '[%=nodeMapping.name%]');
+	
+	newShape.position(x,y);
+	newShape.resize(100,100);
+	newShape.addTo(graph);
+	
+	return newShape;
+}
+

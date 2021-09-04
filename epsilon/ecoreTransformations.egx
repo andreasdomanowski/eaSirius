@@ -1,0 +1,14 @@
+pre commonVariablesAndPaths {
+	//var pathPrefix : String = "C:\\Dev\\Diplomarbeit\\da-editor-template\\src\\";
+}
+
+rule generatePropertiesEditorImports transform one : Any in: " ".asSequence() {
+	template : "eglTemplates/static/importsAndVariables/modelPropertiesEditorImports.egl"
+	target : pathPrefix + "/modelPropertiesEditor/modelPropertiesEditor.ts"
+}
+
+rule generatePropertieseditor transform eClass : EClass {
+	template : "eglTemplates/ecoreToTs/modelPropertiesEditor.egl"
+	target : pathPrefix + "/modelPropertiesEditor/modelPropertiesEditor.ts"
+	append : true
+}

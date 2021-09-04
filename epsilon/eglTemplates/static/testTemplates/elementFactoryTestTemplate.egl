@@ -1,0 +1,12 @@
+import * as elementFactory from "../elementCreation/elementFactory";
+
+describe("Element Factory", () => {
+    test('Test whether factory is initialized', () => {
+        expect(elementFactory.factory).not.toBeNull();
+    });
+
+    test('Test whether a new root element can be initialized', () => {
+        expect(elementFactory.createRootElement()).not.toBeNull();
+    });
+
+})

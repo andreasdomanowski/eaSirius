@@ -1,0 +1,129 @@
+[%
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/StringUtils.eol";
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/OperationTreeToList.eol";
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/MappingMethodNameGenerator.eol";
+
+var createToolMethodName = generateNodeCreationMethodName(nodeCreationDescription);
+
+var operationSequence : Collection = getAllOperations(nodeCreationDescription);
+	
+var currentContext;
+var currentDomainClass;
+var currentFactoryMethod;
+var variableName;
+var reference;
+var referenceComplete;
+
+var toolDisplayName : String = "Tool: " + nodeCreationDescription.id;
+if(nodeCreationDescription.hasProperty("label")){
+	toolDisplayName = nodeCreationDescription.label;
+}
+%]
+// Get palette, add button for new tool
+let paletteEntry[%=nodeCreationDescription.name%] = document.createElement('button');
+paletteEntry[%=nodeCreationDescription.name%].innerText = '[%=toolDisplayName%]';
+document.getElementById(domIdentifier.editorPaletteIdentifier).appendChild(paletteEntry[%=nodeCreationDescription.name%]);
+
+// Add new element on click
+paletteEntry[%=nodeCreationDescription.name%].addEventListener('click', e => {
+	// reset all tools, therefore deactivating all other tools
+	activeToolManagement.resetAllTools();	
+    activeToolManagement.activeToolMapping.set('is[%=nodeCreationDescription.name%]Active', true);
+    activeToolManagement.displayTextBesidesCursor(e, '[%=toolDisplayName%]');
+});
+
+// Add onclick event to paper
+// if creation of [%=nodeCreationDescription.name%] is active, create mapping at onclick position
+paper.on('blank:pointerclick',function (evt, x, y) {
+	if(activeToolManagement.activeToolMapping.get('is[%=nodeCreationDescription.name%]Active') === true){
+		[%=createToolMethodName%](x,y);
+		activeToolManagement.resetAllTools();
+	}
+});
+
+/**
+ * This function implements the creation of the semantic element as specified in [%=nodeCreationDescription.name%]
+ * Furthermore, it creates the requested node mapping.
+ * @param x x-coordinate for requested node mapping
+ * @param y y-coordinate for requested node mapping
+ */
+export function [%=createToolMethodName%](x,y){
+[%
+// get all operations
+
+for(op in operationSequence){
+	if(op.isTypeOf(ChangeContext)){
+		if(op.browseExpression.equals("var:container")){
+			currentContext = "currentRootElement";
+		}else{
+			// TODO - compute context for other expressions
+		}
+	}
+	
+	if(op.isTypeOf(CreateInstance)){
+		currentDomainClass = getDomainClassFromQualifiedName(op.typeName);
+		currentFactoryMethod = "factory.create" + currentDomainClass + "()";
+		variableName = op.variableName;
+		reference = op.referenceName;
+		referenceComplete = currentContext + "." + reference;
+		%]
+	let [%=variableName%] = [%=currentFactoryMethod%];
+	// check, whether reference is a collection ot not		
+	if('add' in [%=referenceComplete%]){
+		// if it is a collection, just add the new element
+		// @ts-ignore
+		[%=referenceComplete%].add([%=variableName%]);	
+	}
+	else{
+		// if it is no collection, this implies a 0..1 relation
+		// therefore, don't set element, if it is already set - user then has to remove it prior to element creation
+		if([%=referenceComplete%] != null){
+			// @ts-ignore
+			[%=referenceComplete%] = [%=variableName%];
+		}else{
+			console.log('Can not create new element. Remove prior elements for this reference.');
+			return;
+		}
+	}
+[%
+	}
+	if(op.isTypeOf(SetValue)){
+%]
+	[%=variableName%].[%=op.featureName%] = '[%=op.valueExpression%]';
+	// call functions for creation of node mappings, add on delete listeners for custom onRemove attribute in node
+	// myNewShape.prop('onRemove') is called on deletion
+[%
+	}
+}	
+// END do ops
+// begin instantiate mappings
+// create a call for every specified node mapping associated to this node
+for (nodeMapping in nodeCreationDescription.nodeMappings) {
+%]
+	let nodeMapping_[%=nodeMapping.name%] = [%=generateNodeMappingCreationMethodName(nodeMapping)%]([%=variableName%], graph, paper, x, y);
+	
+	// on remove function set is a set of functions which is to be called, when the graphical representation is removed
+	let onRemoveFunctionSet = new Set();
+	// remove element in question from the domain model
+	// this function will be called, when the graphical representation is removed
+	// invoked in editorTools.ts (see graph.on('remove',...))
+	let removeElementFromDomainModel = function(){
+		if('add' in [%=referenceComplete%]){
+			// @ts-ignore
+			[%=referenceComplete%].remove([%=variableName%]);	
+		}
+		else{
+			// @ts-ignore
+			[%=referenceComplete%] = null;
+		}
+	}
+	onRemoveFunctionSet.add(removeElementFromDomainModel);
+	
+	// on remove -> delete from semantic model
+	nodeMapping_[%=nodeMapping.name%].prop(props.onRemoveFunctionSet, onRemoveFunctionSet);
+[%
+}
+// end instantiate mappings
+%]
+}
+

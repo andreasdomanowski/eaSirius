@@ -1,0 +1,16 @@
+import * as editor from '../editor/editor'
+
+describe("Editor", () => {
+    test('Test whether exported graph is not null', () => {
+        expect(editor.graph).not.toBeNull();
+    });
+
+    test('Test whether exported model is not null', () => {
+        expect(editor.paper).not.toBeNull();
+    });
+
+    test('Test whether editor has access to current root element', () => {
+        expect(editor.currentRootElement).not.toBeNull();
+    });
+})
+

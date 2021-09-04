@@ -1,0 +1,57 @@
+import * as $ from 'jquery';
+
+// Mapping from tools to their active state
+export const activeToolMapping = new Map();
+
+// After clicking on a tool and then selecting an element in the paper, it gets selected
+// for further processing with the tools. Its cellview gets stored in this variable
+export let currentlySelectedCellview = null;
+
+export function setCurrentlySelectedCellview(state){
+	currentlySelectedCellview = state;
+}
+
+/**
+* Resets currentlySelectedCellview and sets all tools' states to inactive/false
+**/
+export function resetAllTools(){
+	document.documentElement.style.cursor = "default";
+	currentlySelectedCellview = null;
+	activeToolMapping.forEach((value, key) => {
+		activeToolMapping.set(key, false);  
+	});
+	resetCursor();
+}
+
+/**
+ * Displays text besides the cursor on move
+ * @param text
+ */
+export function displayTextBesidesCursor(event, text : string){
+	textBesideCursorDomElement.innerHTML = text;
+	textBesideCursorDomElement.style.display = '';
+	textBesideCursorDomElement.style.top = event.clientY + "px";
+	textBesideCursorDomElement.style.left = event.clientX + "px";
+	document.addEventListener('mousemove', changeCursor);
+}
+
+// helper function, not called externally
+function changeCursor(event){
+	textBesideCursorDomElement.style.top = event.clientY + "px";
+	textBesideCursorDomElement.style.left = event.clientX + "px";
+}
+
+// initial creation of DOM element containing the text besides the cursor
+// hidden by default, only visible upon i) tool activation and ii) cursor movement
+let textBesideCursorDomElement = document.createElement("p");
+textBesideCursorDomElement.style.display = 'none';
+textBesideCursorDomElement.style.zIndex = '50';
+textBesideCursorDomElement.style.position = 'fixed';
+const cursorTextId = 'generatedEditorCursorText';
+textBesideCursorDomElement.id = cursorTextId
+document.body.appendChild(textBesideCursorDomElement);
+
+function resetCursor(){
+	textBesideCursorDomElement.style.display = 'none';
+	document.removeEventListener('mousemove', changeCursor);
+}

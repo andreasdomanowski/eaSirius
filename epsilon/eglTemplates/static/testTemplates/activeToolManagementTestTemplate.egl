@@ -1,0 +1,30 @@
+import * as activeToolManagement from '../mappings/activeToolManagement'
+
+describe("Editor", () => {
+    test('Test whether active tool mapping is not null and a map', () => {
+        expect(activeToolManagement.activeToolMapping).not.toBeNull();
+        expect(activeToolManagement.activeToolMapping instanceof Map).toBeTruthy();
+    });
+
+    test('Test whether reset all tools resets currently selected cell view', () => {
+        activeToolManagement.setCurrentlySelectedCellview({id:'123'});
+        expect(activeToolManagement.currentlySelectedCellview).not.toBeNull();
+
+        activeToolManagement.resetAllTools();
+
+        expect(activeToolManagement.currentlySelectedCellview).toBeNull();
+    });
+
+    test('Test whether reset all tools resets currently active tool mappings', () => {
+        activeToolManagement.activeToolMapping.set('tool1', true);
+        activeToolManagement.activeToolMapping.set('tool2', true);
+        activeToolManagement.activeToolMapping.set('tool3', true);
+
+        activeToolManagement.resetAllTools();
+
+        activeToolManagement.activeToolMapping.forEach(isToolActive => {
+            expect(isToolActive).not.toBeTruthy();
+        })
+    });
+})
+

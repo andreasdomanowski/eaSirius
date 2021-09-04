@@ -1,0 +1,19 @@
+[%
+import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/StringUtils.eol";
+var modelPrefix = importNamespacePrefix;
+var modelPrefixFirstCharUpperCase = modelPrefix.firstToUpperCase();
+var rootClass = getDomainClassFromQualifiedName(diagramDescription.domainClass);
+%]
+import {[%=modelPrefixFirstCharUpperCase%]FactoryImpl} from "[%=modelPrefix%]/[%=modelPrefixFirstCharUpperCase%]FactoryImpl";
+import {[%=modelPrefixFirstCharUpperCase%]PackageImpl} from "[%=modelPrefix%]/[%=modelPrefixFirstCharUpperCase%]PackageImpl";
+import {[%=rootClass%]} from "[%=modelPrefix%]/[%=rootClass%]";
+
+
+export const factory = [%=modelPrefixFirstCharUpperCase%]FactoryImpl.eINSTANCE;
+
+[%=modelPrefixFirstCharUpperCase%]PackageImpl.init()
+
+export function createRootElement() : [%=rootClass%]{
+    return factory.create[%=rootClass%]();
+}
+
