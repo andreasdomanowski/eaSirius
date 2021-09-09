@@ -33,30 +33,30 @@ if(shape.isTypeOf(SquareDescription)){
 	additionalConfiguration = "";
 }
 if(shape.isTypeOf(LozengeNodeDescription)){
-	newShape = "joint.shapes.standard.";
+	// todo
 }
 if(shape.isTypeOf(EllipseNodeDescription)){
 	newShape = "joint.shapes.standard.Ellipse()";
+	newShape.attr('body/refRx', '100%');
 	additionalConfiguration = "";
 }
 if(shape.isTypeOf(DotDescription)){
-	newShape = "joint.shapes.standard.";
+	// todo
 }
 if(shape.isTypeOf(BundledImageDescription)){
-	newShape = "joint.shapes.standard.";
+	// todo
 }
 if(shape.isTypeOf(NoteDescription)){
-	newShape = "joint.shapes.standard.";
+	// todo
 }
 if(shape.isTypeOf(GaugeCompositeStyleDescription)){
-	newShape = "joint.shapes.standard.";
+	// todo
 }
 if(shape.isTypeOf(WorkspaceImageDescription)){
-	newShape = "joint.shapes.standard.Image()";
-	additionalConfiguration = "";
+	// todo
 }
 if(shape.isTypeOf(CustomStyleDescription)){
-	newShape = "joint.shapes.standard.";
+	// todo
 }
 
 %]
@@ -70,7 +70,18 @@ if(shape.isTypeOf(CustomStyleDescription)){
  * @param y x-coordinate for new mapping instance
  */
 export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, graph, paper, x, y){
+	[%if(newShape == null)
+	// if the shape is not yet set, add placeholder
+	{%]
+	let newShape = new joint.shapes.standard.HeaderedRectangle();
+	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
+	newShape.attr('header/fill', 'lightgray');
+	newShape.attr('headerText/text', 'Warning');
+	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
+	[%}
+	else{%]
 	let newShape = new [%=newShape%];
+	[%}%]
 	
 	newShape.attr('label/text', node.[%=featureExpression%]);
 	
