@@ -1,7 +1,7 @@
 [%
-import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/StringUtils.eol";
-import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/OperationTreeToList.eol";
-import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/MappingMethodNameGenerator.eol";
+import "../../eolCommon/StringUtils.eol";
+import "../../eolCommon/OperationTreeToList.eol";
+import "../../eolCommon/MappingMethodNameGenerator.eol";
 
 var createToolMethodName = generateNodeCreationMethodName(nodeCreationDescription);
 
@@ -14,12 +14,14 @@ var variableName;
 var reference;
 var referenceComplete;
 
-var toolDisplayName : String = "Tool: " + nodeCreationDescription.id;
-if(nodeCreationDescription.hasProperty("label")){
+nodeCreationDescription.println();
+
+var toolDisplayName : String = nodeCreationDescription.name;
+if(nodeCreationDescription.hasProperty("label") and not (nodeCreationDescription.label == null)){
 	toolDisplayName = nodeCreationDescription.label;
 }
 %]
-// Get palette, add button for new tool
+// Get palette, add button for new tool [%=nodeCreationDescription.name%]
 let paletteEntry[%=nodeCreationDescription.name%] = document.createElement('button');
 paletteEntry[%=nodeCreationDescription.name%].innerText = '[%=toolDisplayName%]';
 document.getElementById(domIdentifier.editorPaletteIdentifier).appendChild(paletteEntry[%=nodeCreationDescription.name%]);

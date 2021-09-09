@@ -1,9 +1,7 @@
 [%
-import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/OperationTreeToList.eol";
-import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/StringUtils.eol";
-import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/MappingMethodNameGenerator.eol";
-
-
+import "../../eolCommon/OperationTreeToList.eol";
+import "../../eolCommon/StringUtils.eol";
+import "../../eolCommon/MappingMethodNameGenerator.eol";
 
 var operationSequence : Collection = getAllOperations(edgeCreationDescription);
 
@@ -23,8 +21,8 @@ for (mappingCollection in edgeCreationDescription.edgeMappings.targetMapping) {
 	}
 }
 
-var toolDisplayName : String = "Tool: " + edgeCreationDescription.id;
-if(edgeCreationDescription.hasProperty("label")){
+var toolDisplayName : String = "Tool: " + edgeCreationDescription.name;
+if(edgeCreationDescription.hasProperty("label") and not (edgeCreationDescription.label == null)){
 	toolDisplayName = edgeCreationDescription.label;
 }
 

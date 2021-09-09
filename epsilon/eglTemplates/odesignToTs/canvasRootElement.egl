@@ -1,5 +1,5 @@
 [%
-import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/StringUtils.eol";
+import "../../eolCommon/StringUtils.eol";
 var modelPrefix = importNamespacePrefix;
 var modelPrefixFirstCharUpperCase = modelPrefix.firstToUpperCase();
 var rootClass = getDomainClassFromQualifiedName(diagramDescription.domainClass);

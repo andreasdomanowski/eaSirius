@@ -1,10 +1,6 @@
 import "eolCommon/StringUtils.eol";
 import "eolCommon/StringUtils.eol";
 
-pre commonVariablesAndPaths {
-	var pathPrefix : String = "C:\\Dev\\Diplomarbeit\\da-editor-template\\src\\";
-}
-
 // find target viewpoint and its diagram description, which should be translated
 pre findTargets {
 	var targetViewpointWithDiagramDescription : Viewpoint = null;
@@ -12,7 +8,6 @@ pre findTargets {
 	var targetLayer : Layer = null;
 	
 	var viewpoints = Viewpoint.all();
-	viewpoints.println();
 	
 	// find viewpoints with diagram representations
 	// such a viewpoint is found, set target variables
@@ -37,7 +32,6 @@ pre findTargets {
 
 // find model meta data
 pre findModelMetaData{
-	targetDiagramDescription.println();
 	var importNamespacePrefix : String = getPackageNameFromQualifiedName(targetDiagramDescription.domainClass);
 }
 
@@ -67,54 +61,54 @@ pre findCreationTools {
 // contains imports for the other modules
 rule generateIndex transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/indexTemplate.egl"
-	target : pathPrefix + "index.ts"
+	target : pathPrefix + "src/index.ts"
 }
 
 // Generate Editor
 // The editor contains the specification of the model and the view
 rule generateEditor transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/editorTemplate.egl"
-	target : pathPrefix + "editor/editor.ts"
+	target : pathPrefix + "src/editor/editor.ts"
 }
 
 // Generate Editor Tools
 // The tools contain specifications for JointJS tools, e.g., selection tool or remove tool
 rule generateEditorTools transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/editorToolsTemplate.egl"
-	target : pathPrefix + "editor/editorTools.ts"
+	target : pathPrefix + "src/editor/editorTools.ts"
 }
 
 // Rule 0.3 - Generate Editor markup (HTML)
 // The editor contains the specification of the model and the view
 rule generateEditorMarkup transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/editorHTMLMarkup.egl"
-	target : pathPrefix + "editorMarkup/index.html"
+	target : pathPrefix + "src/editorMarkup/index.html"
 }
 
 // Generate file with DOM identifiers.
 // These are used for generating the editor canvas as well as the tools.
 rule generateCommonVariables transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/domIdentifier.egl"
-	target : pathPrefix + "const/domIdentifier.ts"
+	target : pathPrefix + "src/const/domIdentifier.ts"
 }
 
 // Generate serialization
 rule generateSerialization transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/serialization.egl"
-	target : pathPrefix + "serialization/modelSerialization.ts"
+	target : pathPrefix + "src/serialization/modelSerialization.ts"
 }
 
 // Generate constants for JointJS props
 // for using newShape.prop(propConstantName)
 rule generateJointJsPropConstants transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/jointJsModelProps.egl"
-	target : pathPrefix + "const/jointJsPropMapping.ts"
+	target : pathPrefix + "src/const/jointJsPropMapping.ts"
 }
 
 // Generate model synchronization bus
 rule generateModelSynchronizationBus transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/modelSynchronizationBus.egl"
-	target : pathPrefix + "modelSynchronization/modelSynchronizationBus.ts"
+	target : pathPrefix + "src/modelSynchronization/modelSynchronizationBus.ts"
 }
 
 
@@ -123,7 +117,7 @@ rule generateModelSynchronizationBus transform one : Any in: " ".asSequence() {
 rule generateModelFileExtension transform viewpoint : Viewpoint in: targetViewpointWithDiagramDescription.asSequence() {
 	guard : targetViewpointWithDiagramDescription != null
 	template : "eglTemplates/odesignToTs/modelFileExtension.egl"
-	target : pathPrefix + "const/editorMetadata.ts"
+	target : pathPrefix + "src/const/editorMetadata.ts"
 }
 
 // Get context element from diagram representation, generate a root element factory, which instantiates the root element
@@ -138,19 +132,19 @@ rule generateSemanticModelManagementComponent transform diagramDescription : Dia
 		"importNamespacePrefix" = importNamespacePrefix
 	}
 	template : "eglTemplates/odesignToTs/canvasRootElement.egl"
-	target : pathPrefix + "elementCreation/elementFactory.ts"
+	target : pathPrefix + "src/elementCreation/elementFactory.ts"
 }
 
 // Rule 3.0 set up imports for node mappings
 rule generateActiveToolManagement transform one : Any in: "".asSequence() {
 	template : "eglTemplates/static/activeToolManagement.egl"
-	target : pathPrefix + "mappings/activeToolManagement.ts"
+	target : pathPrefix + "src/mappings/activeToolManagement.ts"
 }
 
 // Rule 3.0 set up imports for node mappings
 rule generateNodeMappingImports transform one : Any in: "".asSequence() {
 	template : "eglTemplates/static/importsAndVariables/nodeMappingImportSetup.egl"
-	target : pathPrefix + "mappings/nodeMappings.ts"
+	target : pathPrefix + "src/mappings/nodeMappings.ts"
 }
 
 // Rule 3.1
@@ -160,7 +154,7 @@ rule generateNodeMappingImports transform one : Any in: "".asSequence() {
 rule generateNodeCreationSection transform nodeCreationDescription : NodeCreationDescription
 	in: nodeCreationDescriptions {
 	template : "eglTemplates/odesignToTs/nodeCreation.egl"
-	target : pathPrefix + "mappings/nodeMappings.ts"
+	target : pathPrefix + "src/mappings/nodeMappings.ts"
 	append: true
 }
 
@@ -171,7 +165,7 @@ rule generateNodeCreationSection transform nodeCreationDescription : NodeCreatio
 rule generateNodeMappingSection transform nodeMapping : NodeMapping
 	in: targetLayer.nodeMappings {
 	template : "eglTemplates/odesignToTs/nodeMappingCreation.egl"
-	target : pathPrefix + "mappings/nodeMappings.ts"
+	target : pathPrefix + "src/mappings/nodeMappings.ts"
 	append: true
 }
 
@@ -179,7 +173,7 @@ rule generateNodeMappingSection transform nodeMapping : NodeMapping
 // Rule 4.0 set up imports and variables for relation based edge mappings
 rule generateEdgeMappingImports transform one : Any in: "".asSequence() {
 	template : "eglTemplates/static/importsAndVariables/edgeMappingsRelationBasedImportSetup.egl"
-	target : pathPrefix + "mappings/edgeMappingsRelationBased.ts"
+	target : pathPrefix + "src/mappings/edgeMappingsRelationBased.ts"
 }
 //
 // Rule 4.1
@@ -189,7 +183,7 @@ rule generateEdgeMappingImports transform one : Any in: "".asSequence() {
 rule generateEdgeCreationSection transform edgeCreationDescription : EdgeCreationDescription
 	in: edgeCreationDescriptions {
 	template : "eglTemplates/odesignToTs/edgeCreationRelationBased.egl"
-	target : pathPrefix + "mappings/edgeMappingsRelationBased.ts"
+	target : pathPrefix + "src/mappings/edgeMappingsRelationBased.ts"
 	append: true
 }
 //
@@ -200,7 +194,7 @@ rule generateEdgeCreationSection transform edgeCreationDescription : EdgeCreatio
 rule generateEdgeMappingCreationSection transform edgeMapping : EdgeMapping
 	in: targetLayer.edgeMappings {
 	template : "eglTemplates/odesignToTs/edgeMappingCreationRelationBased.egl"
-	target : pathPrefix + "mappings/edgeMappingsRelationBased.ts"
+	target : pathPrefix + "src/mappings/edgeMappingsRelationBased.ts"
 	append: true
 }
 
@@ -208,26 +202,26 @@ rule generateEdgeMappingCreationSection transform edgeMapping : EdgeMapping
 // generate tests for element factory
 rule generateTestDocumentMocks transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/testTemplates/setup/documentMockTemplate.egl"
-	target : pathPrefix + "__mocks__/documentMocks.ts"
+	target : pathPrefix + "src/__mocks__/documentMocks.ts"
 }
 
 // Rule Tests.static.ActiveToolManagement
 // generate tests for active tool management
 rule generateActiveToolManagementTests transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/testTemplates/activeToolManagementTestTemplate.egl"
-	target : pathPrefix + "__tests__/activeToolManagementTest.ts"
+	target : pathPrefix + "src/__tests__/activeToolManagementTest.ts"
 }
 
 // Rule Tests.static.EditorTests
 // generate tests for editor
 rule generateEditorTests transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/testTemplates/editorTestTemplate.egl"
-	target : pathPrefix + "__tests__/editorTest.ts"
+	target : pathPrefix + "src/__tests__/editorTest.ts"
 }
 
 // Rule Tests.static.ElementFactoryTests
 // generate tests for element factory
 rule generateElementFactoryTests transform one : Any in: " ".asSequence() {
 	template : "eglTemplates/static/testTemplates/elementFactoryTestTemplate.egl"
-	target : pathPrefix + "__tests__/elementFactoryTest.ts"
+	target : pathPrefix + "src/__tests__/elementFactoryTest.ts"
 }
