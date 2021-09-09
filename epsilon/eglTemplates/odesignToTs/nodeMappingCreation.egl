@@ -16,8 +16,8 @@
 // Image - WorkspaceImageDescription		-------->	Image
 // Custom Style - CustomStyleDescription	-------->	?
 
-import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/StringUtils.eol";
-import "platform:/plugin/net.domanowski.diplomathesis.editorgenerator.m2t/src/main/resources/epsilon/eolCommon/MappingMethodNameGenerator.eol";
+import "../../eolCommon/StringUtils.eol";
+import "../../eolCommon/MappingMethodNameGenerator.eol";
 
 var domainClass = getDomainClassFromQualifiedName(nodeMapping.domainClass);
 var shape = nodeMapping.style;
@@ -27,37 +27,6 @@ var featureExpression = purgeLeadingFeatureExpression(shape.labelExpression);
 
 var newShape = null;
 var additionalConfiguration = null;
-
-if(shape.isTypeOf(SquareDescription)){
-	newShape = "joint.shapes.standard.Rectangle()";
-	additionalConfiguration = "";
-}
-if(shape.isTypeOf(LozengeNodeDescription)){
-	// todo
-}
-if(shape.isTypeOf(EllipseNodeDescription)){
-	newShape = "joint.shapes.standard.Ellipse()";
-	newShape.attr('body/refRx', '100%');
-	additionalConfiguration = "";
-}
-if(shape.isTypeOf(DotDescription)){
-	// todo
-}
-if(shape.isTypeOf(BundledImageDescription)){
-	// todo
-}
-if(shape.isTypeOf(NoteDescription)){
-	// todo
-}
-if(shape.isTypeOf(GaugeCompositeStyleDescription)){
-	// todo
-}
-if(shape.isTypeOf(WorkspaceImageDescription)){
-	// todo
-}
-if(shape.isTypeOf(CustomStyleDescription)){
-	// todo
-}
 
 %]
 
@@ -70,18 +39,65 @@ if(shape.isTypeOf(CustomStyleDescription)){
  * @param y x-coordinate for new mapping instance
  */
 export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, graph, paper, x, y){
-	[%if(newShape == null)
-	// if the shape is not yet set, add placeholder
-	{%]
+	let newShape;
+	[%
+	if(shape.isTypeOf(SquareDescription)){%]
+	newShape = new joint.shapes.standard.Rectangle();
+	[%}
+	if(shape.isTypeOf(LozengeNodeDescription)){%]
 	let newShape = new joint.shapes.standard.HeaderedRectangle();
 	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
 	newShape.attr('header/fill', 'lightgray');
 	newShape.attr('headerText/text', 'Warning');
 	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
 	[%}
-	else{%]
-	let newShape = new [%=newShape%];
-	[%}%]
+	if(shape.isTypeOf(EllipseNodeDescription)){%]
+	newShape = new joint.shapes.standard.Ellipse();
+	newShape.attr('body/refRx', '100%');
+	[%}
+	if(shape.isTypeOf(DotDescription)){%]
+	let newShape = new joint.shapes.standard.HeaderedRectangle();
+	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
+	newShape.attr('header/fill', 'lightgray');
+	newShape.attr('headerText/text', 'Warning');
+	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
+	[%}
+	if(shape.isTypeOf(BundledImageDescription)){%]
+	let newShape = new joint.shapes.standard.HeaderedRectangle();
+	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
+	newShape.attr('header/fill', 'lightgray');
+	newShape.attr('headerText/text', 'Warning');
+	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
+	[%}
+	if(shape.isTypeOf(NoteDescription)){%]
+	let newShape = new joint.shapes.standard.HeaderedRectangle();
+	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
+	newShape.attr('header/fill', 'lightgray');
+	newShape.attr('headerText/text', 'Warning');
+	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
+	[%}
+	if(shape.isTypeOf(GaugeCompositeStyleDescription)){%]
+	let newShape = new joint.shapes.standard.HeaderedRectangle();
+	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
+	newShape.attr('header/fill', 'lightgray');
+	newShape.attr('headerText/text', 'Warning');
+	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
+	[%}
+	if(shape.isTypeOf(WorkspaceImageDescription)){%]
+	let newShape = new joint.shapes.standard.HeaderedRectangle();
+	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
+	newShape.attr('header/fill', 'lightgray');
+	newShape.attr('headerText/text', 'Warning');
+	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
+	[%}
+	if(shape.isTypeOf(CustomStyleDescription)){%]
+	let newShape = new joint.shapes.standard.HeaderedRectangle();
+	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
+	newShape.attr('header/fill', 'lightgray');
+	newShape.attr('headerText/text', 'Warning');
+	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
+	[%}
+	%]
 	
 	newShape.attr('label/text', node.[%=featureExpression%]);
 	
