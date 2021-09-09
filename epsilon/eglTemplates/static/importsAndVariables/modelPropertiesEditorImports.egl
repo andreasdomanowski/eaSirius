@@ -4,8 +4,6 @@ import {dia} from "jointjs";
 import CellView = dia.CellView;
 import * as modelSynchronizationBus from '../modelSynchronization/modelSynchronizationBus'
 
-
-
 /**
  * Due to every properties editor adding listeners to fields without clearing them up,
  * there is an map to keep track of all listeners.
@@ -51,6 +49,7 @@ paper.on('link:pointerclick', function (cellView: CellView) {
 			// remove graphical representation, this trigger onRemove methods on cell view model
 			// listener defined in editor.ts
 			graph.removeCells([graph.getCell(cellView.model)]);
+			removePropertiesFormAndListeners();
 		})
 		propertiesPanel.appendChild(removeButton);
 	}
