@@ -1,10 +1,13 @@
 package net.domanowski.easirius.m2t;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -28,6 +31,8 @@ import org.osgi.framework.FrameworkUtil;
 import com.crossecore.CrossEcore;
 
 public class EaSiriusApplication {
+	private static final String RELATIVE_PATH_TO_ODESIGN_TRANSFORMATIONS = "epsilon/odesignTransformations.egx";
+	private static final String RELATIVE_PATH_TO_ECORE_TRANSFORMATIONS = "epsilon/ecoreTransformations.egx";
 	// TODO - replace with SL4J
 	private static final Bundle BUNDLE = FrameworkUtil.getBundle(EaSiriusApplication.class);
 	private static final ILog LOGGER = Platform.getLog(BUNDLE);
@@ -41,44 +46,58 @@ public class EaSiriusApplication {
 	}
 
 	private EaSiriusApplication() {
-
+		// hide non arg-constructor
 	}
 
-	public static void generateEditor(String pathToEditorDescriptionString, String pathToMetaModelString,
-			String pathToOutputFolderString) {
-		Objects.requireNonNull(pathToEditorDescriptionString);
-		Objects.requireNonNull(pathToMetaModelString);
-		Objects.requireNonNull(pathToEditorDescriptionString);
+	public static void generateEditor(String pathToEditorDescription, String pathToMetaModel,
+			String pathToOutputFolder) {
+		Objects.requireNonNull(pathToEditorDescription);
+		Objects.requireNonNull(pathToMetaModel);
+		Objects.requireNonNull(pathToEditorDescription);
 
 		// sanitize output path
-		final String sanitizedOutputFolderString = pathToOutputFolderString.endsWith(File.separator)
-				? pathToOutputFolderString
-				: pathToOutputFolderString + File.separator;
+		final String sanitizedOutputFolderString = pathToOutputFolder.endsWith(File.separator) ? pathToOutputFolder
+				: pathToOutputFolder + File.separator;
 
 		log("Generating Editor in the following path: " + sanitizedOutputFolderString);
 
-		File editorDescriptionFile = new File(pathToEditorDescriptionString);
-		File metaModelFile = new File(pathToMetaModelString);
-		File targetFolderFile = new File(pathToOutputFolderString);
+		File editorDescriptionFile = new File(pathToEditorDescription);
+		File metaModelFile = new File(pathToMetaModel);
+		File targetFolderFile = new File(pathToOutputFolder);
 
 		Runnable generateEditor = () -> {
-			executeEcoreTransformations(metaModelFile, targetFolderFile);
-			log("Generated Properties Editor");
+			try {
+				executeOdesignTransformations(editorDescriptionFile, targetFolderFile);
+				log("Generated Editor Application and translated Viewpoint Specification Model");
+			} catch (IOException | URISyntaxException e) {
+				log("Error while generating editor and translating viewpoint specification model");
+				e.printStackTrace();
+			}
 
-			executeOdesignTransformations(editorDescriptionFile, targetFolderFile);
-			log("Generated Editor Application and translated Viewpoint Specification Model");
+			try {
+				executeEcoreTransformations(metaModelFile, targetFolderFile);
+				log("Generated properties editor");
+			} catch (URISyntaxException | IOException e) {
+				log("Error while generating properties editor");
+				e.printStackTrace();
+			}
 
-			String[] crossEcoreArguments = { "-L", "typescript", "-e", pathToMetaModelString, "-p",
+			String[] crossEcoreArguments = { "-L", "typescript", "-e", pathToMetaModel, "-p",
 					sanitizedOutputFolderString };
 			CrossEcore.main(crossEcoreArguments);
+			log("Generated Metamodel implementation");
+
 		};
 
 		BusyIndicator.showWhile(PlatformUI.getWorkbench().getDisplay(), generateEditor);
 	}
 
-	private static void executeEcoreTransformations(File metaModelFile, File targetFolderFile) {		
-		Path pathToEgx = Path
-				.of("C:\\Dev\\diplomarbeitWorkspace\\net.domanowski.easirius\\epsilon\\ecoreTransformations.egx");
+	private static void executeEcoreTransformations(File metaModelFile, File targetFolderFile)
+			throws URISyntaxException, IOException {
+		URL fileURL = BUNDLE.getEntry(RELATIVE_PATH_TO_ECORE_TRANSFORMATIONS);
+
+		URL newUrl = FileLocator.toFileURL(fileURL);
+		Path pathToEgx = Path.of(newUrl.toURI());
 
 		StringProperties modelProperties = new StringProperties();
 		modelProperties.setProperty(EmfModel.PROPERTY_NAME, "Model");
@@ -96,9 +115,12 @@ public class EaSiriusApplication {
 		runConfig.run();
 	}
 
-	private static void executeOdesignTransformations(File editorDescriptionFile, File targetFolderFile) {
-		Path pathToEgx = Path
-				.of("C:\\Dev\\diplomarbeitWorkspace\\net.domanowski.easirius\\epsilon\\odesignTransformations.egx");
+	private static void executeOdesignTransformations(File editorDescriptionFile, File targetFolderFile)
+			throws IOException, URISyntaxException {
+		URL fileURL = BUNDLE.getEntry(RELATIVE_PATH_TO_ODESIGN_TRANSFORMATIONS);
+
+		URL newUrl = FileLocator.toFileURL(fileURL);
+		Path pathToEgx = Path.of(newUrl.toURI());
 
 		StringProperties modelProperties = new StringProperties();
 		modelProperties.setProperty(EmfModel.PROPERTY_NAME, "Model");
@@ -124,30 +146,6 @@ public class EaSiriusApplication {
 			}
 		});
 		runConfig.run();
-	}
-
-	protected static String registerMetamodel(String sourceMetamodel) throws URISyntaxException {
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
-
-		// Create a new Resource set for the xml-based metamodel resources
-		ResourceSet rs = new ResourceSetImpl();
-		final ExtendedMetaData extendedMetaData = new BasicExtendedMetaData(rs.getPackageRegistry());
-		rs.getLoadOptions().put(XMLResource.OPTION_EXTENDED_META_DATA, extendedMetaData);
-
-		// Create a metamodel resource from the metamodel file path by URI
-		// Register the metamodel with the NsURI (EMF interne URI) in the EMF Resource
-		// registry
-		Resource r = rs.getResource(org.eclipse.emf.common.util.URI.createFileURI(sourceMetamodel), true);
-
-		r.getAllContents().forEachRemaining(obj -> {
-			if (obj instanceof EPackage) {
-				EPackage ePackage = (EPackage) obj;
-				log("Registering " + ePackage.getNsURI());
-				EPackage.Registry.INSTANCE.put(ePackage.getNsURI(), ePackage);
-			}
-		});
-
-		return null;
 	}
 
 }
