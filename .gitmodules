@@ -1,0 +1,3 @@
+[submodule "com.crossecore.generator.easirius"]
+	path = com.crossecore.generator.easirius
+	url = https://github.com/andreasdomanowski/CrossEcore-eaSirius-generator.git

@@ -56,9 +56,7 @@ public class EaSiriusWizardPageOne extends WizardPage {
 		textboxOdesignPath.setEnabled(false);
 		Button textboxSelectOdesign = new Button(container, SWT.NONE);
 		textboxSelectOdesign.setText(MESSAGE_BUTTON_SELECT);
-		textboxSelectOdesign.addListener(SWT.Selection, l -> {
-			openFileDialogAndSetTextboxUponFinish(textboxOdesignPath);
-		});
+		textboxSelectOdesign.addListener(SWT.Selection, l -> openFileDialogAndSetTextboxUponFinish(textboxOdesignPath));
 
 		Label labelMetamodel = new Label(container, SWT.NONE);
 		labelMetamodel.setText(MESSAGE_PATH_METAMODEL);

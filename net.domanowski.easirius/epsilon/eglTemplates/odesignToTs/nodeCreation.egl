@@ -14,8 +14,6 @@ var variableName;
 var reference;
 var referenceComplete;
 
-nodeCreationDescription.println();
-
 var toolDisplayName : String = nodeCreationDescription.name;
 if(nodeCreationDescription.hasProperty("label") and not (nodeCreationDescription.label == null)){
 	toolDisplayName = nodeCreationDescription.label;
