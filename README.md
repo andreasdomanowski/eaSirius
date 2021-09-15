@@ -12,14 +12,14 @@ This Eclipse plugin contains model-to-text transformations for generating client
   - ```git clone --recursive git@github.com:andreasdomanowski/eaSirius.git``` (ssh) or
   - ```git clone --recursive https://github.com/andreasdomanowski/eaSirius.git``` (https)
 - Import the two cloned projects in your Eclipse instance
-  - ```File``` -> ```Import``` -> ```General``` -> ```Existing Projects into Workspace```
+  - ```File``` → ```Import``` → ```General``` → ```Existing Projects into Workspace```
   - Check ```Select Root Directory``` and set the path to the cloned repostitory
   - Select the projects ```net.domanowski.easirius``` and ```com.crossecore.generator.easirius```
   - Click ```Finish```
 
 ## Usage
 - Right click on ```net.domanowski.easirius```
-- Select ```Run As``` -> ```Eclispe Application```
+- Select ```Run As``` → ```Eclispe Application```
 - In the spawned Eclipse instance, click ```eaSirius``` in the upper menu/navigation bar
 - Follow the instructions in the wizard. This generates an npm project that any Node/JS/TS compatible IDE is able to import
 - To have a look at the generated editor, start the webpack dev server with ```npm run start:dev``` after installing the dependencies via ```npm install``` in the generated folder
