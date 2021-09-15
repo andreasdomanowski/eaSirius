@@ -47,8 +47,6 @@ public class EaSiriusWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
