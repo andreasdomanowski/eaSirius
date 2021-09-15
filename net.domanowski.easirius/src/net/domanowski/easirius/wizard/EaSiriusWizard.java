@@ -20,7 +20,7 @@ public class EaSiriusWizard extends Wizard implements INewWizard {
 
 	@Override
 	public String getWindowTitle() {
-		return "LaTex Export";
+		return "eaSirius Wizard";
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class EaSiriusWizard extends Wizard implements INewWizard {
 		Objects.requireNonNull(outputFolderPath);
 
 		EaSiriusApplication.generateEditor(odesignPath, metamodelPath, outputFolderPath);
-		MessageDialog.openInformation(getShell(), "eaSirius", "Generated Editor. Or Not. Implement success check!");
+		MessageDialog.openInformation(getShell(), "eaSirius", "Generated eaSirius Editor in path " + outputFolderPath);
 
 		return true;
 	}
