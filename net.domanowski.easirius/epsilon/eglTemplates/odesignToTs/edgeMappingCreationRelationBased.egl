@@ -5,12 +5,26 @@ var edgeMappingStyle = edgeMapping.style;
 var sourceArrow = edgeMappingStyle.sourceArrow;
 var targetArrow = edgeMappingStyle.targetArrow;
 var strokeColor = edgeMappingStyle.strokeColor;
+
  %]
  
  function [%=generateEdgeMappingCreationMethodName(edgeMapping)%](sourceCell, targetCell, onRemoveFunction){
 	var link = new joint.shapes.standard.Link();
     link.source(sourceCell);
     link.target(targetCell);
+    
+    [%
+    if(sourceArrow.toString().equals('NoDecoration')){
+    %]
+    link.attr('line/sourceMarker', null);
+    [%
+    }
+    if(targetArrow.toString().equals('NoDecoration')){
+    %]
+    link.attr('line/targetMarker', null);
+    [%
+    }
+    %]
     link.addTo(graph);
         		
     // function for source element, which is to be called, when source element is removed
