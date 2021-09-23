@@ -7,12 +7,12 @@
     <intAttribute key="generateTo" value="1"/>
     <stringAttribute key="implementation_name" value="Sequential EGX"/>
     <listAttribute key="models">
-        <listEntry value="#Thu Sep 09 20:47:58 CEST 2021&#13;&#10;aliases=&#13;&#10;reuseUnmodifiedFileBasedMetamodels=true&#13;&#10;modelFile=/net.domanowski.diplomathesis.morecomplexmodel.description/description/moreComplexModelDescriptionAsXmi.xmi&#13;&#10;metamodelUri=http\://www.eclipse.org/sirius/1.1.0,http\://www.eclipse.org/sirius/diagram/1.1.0,http\://www.eclipse.org/emf/2002/Ecore&#13;&#10;concurrent=false&#13;&#10;type=EMF&#13;&#10;readOnLoad=true&#13;&#10;storeOnDisposal=true&#13;&#10;expand=true&#13;&#10;fileBasedMetamodelUri=&#13;&#10;metamodelFile=&#13;&#10;cached=true&#13;&#10;name=M&#13;&#10;modelUri=platform\:/resource/net.domanowski.diplomathesis.morecomplexmodel.description/description/moreComplexModelDescriptionAsXmi.xmi&#13;&#10;isMetamodelFileBased=false"/>
+        <listEntry value="#Thu Sep 23 20:47:11 CEST 2021&#13;&#10;aliases=&#13;&#10;reuseUnmodifiedFileBasedMetamodels=true&#13;&#10;modelFile=/net.domanowski.diplomathesis.morecomplexmodel.description/description/moreComplexModelDescriptionAsXmi.xmi&#13;&#10;metamodelUri=http\://www.eclipse.org/sirius/1.1.0,http\://www.eclipse.org/sirius/diagram/1.1.0,http\://www.eclipse.org/emf/2002/Ecore&#13;&#10;concurrent=false&#13;&#10;type=EMF&#13;&#10;readOnLoad=true&#13;&#10;storeOnDisposal=false&#13;&#10;expand=true&#13;&#10;fileBasedMetamodelUri=&#13;&#10;metamodelFile=&#13;&#10;cached=true&#13;&#10;name=M&#13;&#10;modelUri=platform\:/resource/net.domanowski.diplomathesis.morecomplexmodel.description/description/moreComplexModelDescriptionAsXmi.xmi&#13;&#10;isMetamodelFileBased=false"/>
     </listAttribute>
     <stringAttribute key="outputDirPath" value=""/>
     <stringAttribute key="outputFilePath" value=""/>
     <listAttribute key="parameters">
-        <listEntry value="#Thu Sep 09 20:47:58 CEST 2021&#13;&#10;name=pathPrefix&#13;&#10;type=String&#13;&#10;value=C\:/desiredPath/"/>
+        <listEntry value="#Thu Sep 23 20:47:12 CEST 2021&#13;&#10;name=pathPrefix&#13;&#10;type=String&#13;&#10;value=C\:/desiredPath/"/>
     </listAttribute>
     <booleanAttribute key="produceTrace" value="false"/>
     <booleanAttribute key="profile_model_loading" value="false"/>
