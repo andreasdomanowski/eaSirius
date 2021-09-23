@@ -28,6 +28,13 @@ var featureExpression = purgeLeadingFeatureExpression(shape.labelExpression);
 var newShape = null;
 var additionalConfiguration = null;
 
+var backgroundColor : String = null;
+
+if(nodeMapping.style.hasProperty("color") and not (nodeMapping.style == null)){
+	backgroundColor = nodeMapping.style.color.name;
+	backgroundColor = backgroundColor.replace('_', '');
+}
+
 %]
 
 /**
@@ -43,7 +50,11 @@ export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, gr
 	[%
 	if(shape.isTypeOf(SquareDescription)){%]
 	newShape = new joint.shapes.standard.Rectangle();
+	[%if(not (backgroundColor == null)){%]
+	newShape.attr('body/fill', '[%=backgroundColor%]');
 	[%}
+	}
+	
 	if(shape.isTypeOf(LozengeNodeDescription)){%]
 	let newShape = new joint.shapes.standard.HeaderedRectangle();
 	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
@@ -51,10 +62,19 @@ export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, gr
 	newShape.attr('headerText/text', 'Warning');
 	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
 	[%}
+	
 	if(shape.isTypeOf(EllipseNodeDescription)){%]
 	newShape = new joint.shapes.standard.Ellipse();
 	newShape.attr('body/refRx', '100%');
+	
+	[%
+	if(not (backgroundColor == null)){	%]
+	newShape.attr('body/fill', '[%=backgroundColor%]');
 	[%}
+	%]
+	
+	[%}
+	
 	if(shape.isTypeOf(DotDescription)){%]
 	let newShape = new joint.shapes.standard.HeaderedRectangle();
 	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
@@ -62,6 +82,7 @@ export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, gr
 	newShape.attr('headerText/text', 'Warning');
 	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
 	[%}
+	
 	if(shape.isTypeOf(BundledImageDescription)){%]
 	let newShape = new joint.shapes.standard.HeaderedRectangle();
 	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
@@ -69,6 +90,7 @@ export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, gr
 	newShape.attr('headerText/text', 'Warning');
 	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
 	[%}
+	
 	if(shape.isTypeOf(NoteDescription)){%]
 	let newShape = new joint.shapes.standard.HeaderedRectangle();
 	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
@@ -76,6 +98,7 @@ export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, gr
 	newShape.attr('headerText/text', 'Warning');
 	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
 	[%}
+	
 	if(shape.isTypeOf(GaugeCompositeStyleDescription)){%]
 	let newShape = new joint.shapes.standard.HeaderedRectangle();
 	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
@@ -83,6 +106,7 @@ export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, gr
 	newShape.attr('headerText/text', 'Warning');
 	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
 	[%}
+	
 	if(shape.isTypeOf(WorkspaceImageDescription)){%]
 	let newShape = new joint.shapes.standard.HeaderedRectangle();
 	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
@@ -90,6 +114,7 @@ export function [%=generateNodeMappingCreationMethodName(nodeMapping)%](node, gr
 	newShape.attr('headerText/text', 'Warning');
 	newShape.attr('bodyText/text', 'Shape not yet\n implemented');
 	[%}
+	
 	if(shape.isTypeOf(CustomStyleDescription)){%]
 	let newShape = new joint.shapes.standard.HeaderedRectangle();
 	newShape.attr('root/title', 'joint.shapes.standard.HeaderedRectangle');
